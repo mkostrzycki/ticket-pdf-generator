@@ -26,6 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($ticketPrice > 0) {
 
+                    $originAirportName = null;
+                    $destinationAirportName = null;
+
+                    $originAirportTimeZone = null;
+                    $destinationAirportTimeZone = null;
+
                     foreach ($airports as $airport) {
 
                         if ($originAirportCode == $airport['code']) {
@@ -38,15 +44,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
 
-                    var_dump($originAirportTimeZone);
+                    $originAirportLocalTime = new DateTime($departureDateAndTime, $originAirportTimeZone);
 
-                    var_dump($destinationAirportTimeZone);
+                    // calculate time of arrival in destination time zone
+                    $destinationAirportLocalTime = new DateTime($departureDateAndTime, $originAirportTimeZone);
+                    $destinationAirportLocalTime->setTimezone($destinationAirportTimeZone); // change timezone to destination
+                    $destinationAirportLocalTime->modify($flightTime . ' hours'); // add flight time
+
+                    // get date and time as a string
+                    $originAirportLocalTime = $originAirportLocalTime->format('d-m-Y H:i:s');
+                    $destinationAirportLocalTime = $destinationAirportLocalTime->format('d-m-Y H:i:s');
 
                     $ticketHtml = '';
 
-                    $ticketHtml .= 'Origin Airport: ' . $originAirportName . '<br>';
-                    $ticketHtml .= 'Destination Airport: ' . $destinationAirportName . '<br>';
-                    $ticketHtml .= 'Departure: ' . $departureDateAndTime . '<br>';
+                    $ticketHtml .= 'Origin Airport: ' . $originAirportName . ' [' . $originAirportCode . ']<br>';
+                    $ticketHtml .= 'Departure time: ' . $originAirportLocalTime . ' (' . timezone_name_get($originAirportTimeZone) . ' local time)<br>';
+                    $ticketHtml .= 'Destination Airport: ' . $destinationAirportName . ' [' . $destinationAirportCode . ']<br>';
+                    $ticketHtml .= 'Arrival time: ' . $destinationAirportLocalTime . ' (' . timezone_name_get($destinationAirportTimeZone) . ' local time)<br>';
                     $ticketHtml .= 'Flight time: ' . $flightTime . '<br>';
                     $ticketHtml .= 'Ticket price: ' . $ticketPrice;
 
@@ -54,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $errorMessage = 'Ticket price is less than zero.';
                 }
 
-            } else { // $_POST['departure'] and/or $_POST['flightTime'] and/or $_POST['ticketPrice'] are not set or invalid
+            } else { // $_POST['departure'] and/or $_POST['flightTime'] and/or $_POST['ticketPrice'] are not set or are invalid
                 $errorMessage = 'Departure date, flight time and ticket price are not set or incorrect.';
             }
 
@@ -62,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errorMessage = 'You have chosen the same origin and destination airports.';
         }
 
-    } else { // $_POST['origin'] or/and $_POST['destination'] are not set or empty
+    } else { // $_POST['origin'] or/and $_POST['destination'] are not set or are empty
         $errorMessage = 'No information about airports.';
     }
 }
@@ -82,7 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 <div class="container">
-    <p>Preview:</p>
     <div class="row">
         <!-- message / errorMessage -->
         <?php
@@ -94,8 +107,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ?>
     </div>
     <div class="row">
+        <h3>Preview:</h3>
         <?php
-        echo $ticketHtml;
+        if (isset($ticketHtml)) {
+            echo $ticketHtml;
+        }
         ?>
     </div>
     <div class="row">

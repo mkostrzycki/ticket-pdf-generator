@@ -6,6 +6,8 @@ use NumberToWords\NumberToWords;
 require_once(__DIR__ . '/../vendor/autoload.php');
 include_once(__DIR__ . '/../includes/airports.php');
 
+session_start();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['origin']) && !empty($_POST['origin'])
@@ -97,68 +99,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $ticketHtml .= '<div class="ticket">';
 
                     $ticketHtml .= '<div class="logotype">'
-                        . '<span class="glyphicon glyphicon-globe"></span>'
-                        . ' NeverFalling Airlines ;)</div>';
+                        . '<p class="plane">&nbsp;&nbsp;&nbsp;&nbsp;__|__          NeverFalling</p><p class="plane">---o-(_)-o--- Airlines</p></div>';
 
-                    $ticketHtml .= '<span class="header width-100">Time Of Departure</span>';
+                    $ticketHtml .= '<div class="header width-100">Time Of Departure</div>';
                     $ticketHtml .= '<div class="clear"></div>';
-                    $ticketHtml .= '<span class="text width-100">'
+                    $ticketHtml .= '<div class="text width-100">'
                         . $originAirportLocalTime
                         . '<span class="small"> ('
                         . timezone_name_get($originAirportTimeZone)
-                        . ' local time)</span></span>';
+                        . ' local time)</span></div>';
                     $ticketHtml .= '<div class="clear"></div>';
 
-                    $ticketHtml .= '<span class="header inner width-50">From | Origin</span><span class="header width-50">To | Destination</span>';
+                    $ticketHtml .= '<div class="header inner width-50">From | Origin</div><div class="header width-50">To | Destination</div>';
                     $ticketHtml .= '<div class="clear"></div>';
-                    $ticketHtml .= '<span class="text inner width-50">'
+                    $ticketHtml .= '<div class="text inner width-50">'
                         . $originAirportName
                         . '<span class="small"> ['
                         . $originAirportCode
-                        . ']</span></span>';
+                        . ']</span></div>';
 
-                    $ticketHtml .= '<span class="text width-50">'
+                    $ticketHtml .= '<div class="text width-50">'
                         . $destinationAirportName
                         . '<span class="small"> ['
                         . $destinationAirportCode
-                        . ']</span></span>';
+                        . ']</span></div>';
                     $ticketHtml .= '<div class="clear"></div>';
 
-                    $ticketHtml .= '<span class="header width-100">Time Of Arrival</span>';
+                    $ticketHtml .= '<div class="header width-100">Time Of Arrival</div>';
                     $ticketHtml .= '<div class="clear"></div>';
-                    $ticketHtml .= '<span class="text width-100">'
+                    $ticketHtml .= '<div class="text width-100">'
                         . $destinationAirportLocalTime
                         . '<span class="small"> ('
                         . timezone_name_get($destinationAirportTimeZone)
-                        . ' local time)</span></span>';
+                        . ' local time)</span></div>';
                     $ticketHtml .= '<div class="clear"></div>';
 
-                    $ticketHtml .= '<span class="header inner width-50">Ticket price</span><span class="header width-50">Flight time</span>';
+                    $ticketHtml .= '<div class="header inner width-50">Ticket price</div><div class="header width-50">Flight time</div>';
                     $ticketHtml .= '<div class="clear"></div>';
-                    $ticketHtml .= '<span class="text inner width-50">'
-                        . number_format((float) $ticketPrice, 2, ',', ' ')
-                        . ' zł</span>';
+                    $ticketHtml .= '<div class="text inner width-50">'
+                        . number_format((float)$ticketPrice, 2, ',', ' ')
+                        . ' zł</div>';
 
-                    $ticketHtml .= '<span class="text width-50">'
+                    $ticketHtml .= '<div class="text width-50">'
                         . $flightTime
-                        . ' hour(s)</span>';
+                        . ' hour(s)</div>';
                     $ticketHtml .= '<div class="clear"></div>';
 
-                    $ticketHtml .= '<span class="header width-100">Price in words</span>';
+                    $ticketHtml .= '<div class="header width-100">Price in words</div>';
                     $ticketHtml .= '<div class="clear"></div>';
-                    $ticketHtml .= '<span class="text width-100">'
+                    $ticketHtml .= '<div class="text width-100">'
                         . $ticketPriceInWords
-                        . '</span>';
+                        . '</div>';
                     $ticketHtml .= '<div class="clear"></div>';
 
-                    $ticketHtml .= '<span class="header width-100">Passenger name</span>';
+                    $ticketHtml .= '<div class="header width-100">Passenger name</div>';
                     $ticketHtml .= '<div class="clear"></div>';
-                    $ticketHtml .= '<span class="text width-100">'
+                    $ticketHtml .= '<div class="text width-100">'
                         . $passengerName
-                        . '</span>';
+                        . '</div>';
                     $ticketHtml .= '<div class="clear"></div>';
 
                     $ticketHtml .= '</div>';
+
+                    $_SESSION['ticketHtml'] = $ticketHtml;
 
                 } else { // $ticketPrice < 0
                     $errorMessage = 'Ticket price is less than zero.';
@@ -212,7 +215,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ?>
     </div>
     <div class="row">
-        <p><a href="index.php"><<< Back to form</a></p>
+        <div class="btn-group">
+            <a href="index.php" class="btn btn-info" role="button"><<< Back to form</a>
+            <a href="pdf.php" class="btn btn-primary" role="button">Download PDF</a>
+        </div>
     </div>
 </div>
 </body>

@@ -1,8 +1,8 @@
 <?php
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+include_once(__DIR__ . '/../includes/airports.php');
 
-    var_dump($_POST);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['origin']) && !empty($_POST['origin'])
         && isset($_POST['destination']) && !empty($_POST['destination'])
@@ -26,11 +26,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($ticketPrice > 0) {
 
+                    foreach ($airports as $airport) {
+
+                        if ($originAirportCode == $airport['code']) {
+                            $originAirportName = $airport['name'];
+                            $originAirportTimeZone = new DateTimeZone($airport['timezone']);
+
+                        } elseif ($destinationAirportCode == $airport['code']) {
+                            $destinationAirportName = $airport['name'];
+                            $destinationAirportTimeZone = new DateTimeZone($airport['timezone']);
+                        }
+                    }
+
+                    var_dump($originAirportTimeZone);
+
+                    var_dump($destinationAirportTimeZone);
+
                     $ticketHtml = '';
 
-                    $ticketHtml .= $departureDateAndTime . '<br>';
-                    $ticketHtml .= $flightTime . '<br>';
-                    $ticketHtml .= $ticketPrice;
+                    $ticketHtml .= 'Origin Airport: ' . $originAirportName . '<br>';
+                    $ticketHtml .= 'Destination Airport: ' . $destinationAirportName . '<br>';
+                    $ticketHtml .= 'Departure: ' . $departureDateAndTime . '<br>';
+                    $ticketHtml .= 'Flight time: ' . $flightTime . '<br>';
+                    $ticketHtml .= 'Ticket price: ' . $ticketPrice;
 
                 } else { // $ticketPrice < 0
                     $errorMessage = 'Ticket price is less than zero.';

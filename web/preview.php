@@ -1,6 +1,7 @@
 <?php
 
 use Faker\Factory;
+use NumberToWords\NumberToWords;
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 include_once(__DIR__ . '/../includes/airports.php');
@@ -71,10 +72,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     /**
                      * Generate name using fzaninotto/faker
+                     * (https://github.com/fzaninotto/Faker)
                      */
 
                     $faker = Factory::create();
                     $passengerName = $faker->name;
+
+                    /**
+                     * Convert price to words using kwn/number-to-words
+                     * (https://github.com/kwn/number-to-words)
+                     */
+
+                    $numberToWords = new NumberToWords();
+                    $currencyTransformer = $numberToWords->getCurrencyTransformer('en');
+
+                    $ticketPriceInWords = $currencyTransformer->toWords($ticketPrice * 100, 'PLN'); // amount in grosze
 
                     /**
                      * Generate html
@@ -88,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $ticketHtml .= 'Arrival time: ' . $destinationAirportLocalTime . ' (' . timezone_name_get($destinationAirportTimeZone) . ' local time)<br>';
                     $ticketHtml .= 'Flight time: ' . $flightTime . '<br>';
                     $ticketHtml .= 'Ticket price: ' . $ticketPrice . '<br>';
+                    $ticketHtml .= 'In words: ' . $ticketPriceInWords . '<br>';
                     $ticketHtml .= 'Passenger: ' . $passengerName;
 
                 } else { // $ticketPrice < 0
@@ -119,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Ticket Generator - Preview</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/ticketStyle.css">
 </head>
 <body>
 <div class="container">

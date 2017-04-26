@@ -94,14 +94,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $ticketHtml = '';
 
-                    $ticketHtml .= 'Origin Airport: ' . $originAirportName . ' [' . $originAirportCode . ']<br>';
-                    $ticketHtml .= 'Departure time: ' . $originAirportLocalTime . ' (' . timezone_name_get($originAirportTimeZone) . ' local time)<br>';
-                    $ticketHtml .= 'Destination Airport: ' . $destinationAirportName . ' [' . $destinationAirportCode . ']<br>';
-                    $ticketHtml .= 'Arrival time: ' . $destinationAirportLocalTime . ' (' . timezone_name_get($destinationAirportTimeZone) . ' local time)<br>';
-                    $ticketHtml .= 'Flight time: ' . $flightTime . '<br>';
-                    $ticketHtml .= 'Ticket price: ' . $ticketPrice . '<br>';
-                    $ticketHtml .= 'In words: ' . $ticketPriceInWords . '<br>';
-                    $ticketHtml .= 'Passenger: ' . $passengerName;
+                    $ticketHtml .= '<div class="ticket">';
+
+                    $ticketHtml .= '<div class="logotype">'
+                        . '<span class="glyphicon glyphicon-globe"></span>'
+                        . ' NeverFalling Airlines ;)</div>';
+
+                    $ticketHtml .= '<span class="header width-100">Time Of Departure</span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+                    $ticketHtml .= '<span class="text width-100">'
+                        . $originAirportLocalTime
+                        . '<span class="small"> ('
+                        . timezone_name_get($originAirportTimeZone)
+                        . ' local time)</span></span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+
+                    $ticketHtml .= '<span class="header inner width-50">From | Origin</span><span class="header width-50">To | Destination</span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+                    $ticketHtml .= '<span class="text inner width-50">'
+                        . $originAirportName
+                        . '<span class="small"> ['
+                        . $originAirportCode
+                        . ']</span></span>';
+
+                    $ticketHtml .= '<span class="text width-50">'
+                        . $destinationAirportName
+                        . '<span class="small"> ['
+                        . $destinationAirportCode
+                        . ']</span></span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+
+                    $ticketHtml .= '<span class="header width-100">Time Of Arrival</span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+                    $ticketHtml .= '<span class="text width-100">'
+                        . $destinationAirportLocalTime
+                        . '<span class="small"> ('
+                        . timezone_name_get($destinationAirportTimeZone)
+                        . ' local time)</span></span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+
+                    $ticketHtml .= '<span class="header inner width-50">Ticket price</span><span class="header width-50">Flight time</span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+                    $ticketHtml .= '<span class="text inner width-50">'
+                        . number_format((float) $ticketPrice, 2, ',', ' ')
+                        . ' zł</span>';
+
+                    $ticketHtml .= '<span class="text width-50">'
+                        . $flightTime
+                        . ' hour(s)</span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+
+                    $ticketHtml .= '<span class="header width-100">Price in words</span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+                    $ticketHtml .= '<span class="text width-100">'
+                        . $ticketPriceInWords
+                        . '</span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+
+                    $ticketHtml .= '<span class="header width-100">Passenger name</span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+                    $ticketHtml .= '<span class="text width-100">'
+                        . $passengerName
+                        . '</span>';
+                    $ticketHtml .= '<div class="clear"></div>';
+
+                    $ticketHtml .= '</div>';
 
                 } else { // $ticketPrice < 0
                     $errorMessage = 'Ticket price is less than zero.';

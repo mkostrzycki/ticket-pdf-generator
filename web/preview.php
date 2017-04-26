@@ -1,5 +1,8 @@
 <?php
 
+use Faker\Factory;
+
+require_once(__DIR__ . '/../vendor/autoload.php');
 include_once(__DIR__ . '/../includes/airports.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,23 +29,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($ticketPrice > 0) {
 
+                    /**
+                     * Get data from airports table
+                     */
+
                     $originAirportName = null;
                     $destinationAirportName = null;
 
                     $originAirportTimeZone = null;
                     $destinationAirportTimeZone = null;
 
-                    foreach ($airports as $airport) {
+                    if (isset($airports)) {
 
-                        if ($originAirportCode == $airport['code']) {
-                            $originAirportName = $airport['name'];
-                            $originAirportTimeZone = new DateTimeZone($airport['timezone']);
+                        foreach ($airports as $airport) {
 
-                        } elseif ($destinationAirportCode == $airport['code']) {
-                            $destinationAirportName = $airport['name'];
-                            $destinationAirportTimeZone = new DateTimeZone($airport['timezone']);
+                            if ($originAirportCode == $airport['code']) {
+                                $originAirportName = $airport['name'];
+                                $originAirportTimeZone = new DateTimeZone($airport['timezone']);
+
+                            } elseif ($destinationAirportCode == $airport['code']) {
+                                $destinationAirportName = $airport['name'];
+                                $destinationAirportTimeZone = new DateTimeZone($airport['timezone']);
+                            }
                         }
                     }
+
+                    /**
+                     * Calculate dates and times
+                     */
 
                     $originAirportLocalTime = new DateTime($departureDateAndTime, $originAirportTimeZone);
 
@@ -55,6 +69,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $originAirportLocalTime = $originAirportLocalTime->format('d-m-Y H:i:s');
                     $destinationAirportLocalTime = $destinationAirportLocalTime->format('d-m-Y H:i:s');
 
+                    /**
+                     * Generate name using fzaninotto/faker
+                     */
+
+                    $faker = Factory::create();
+                    $passengerName = $faker->name;
+
+                    /**
+                     * Generate html
+                     */
+
                     $ticketHtml = '';
 
                     $ticketHtml .= 'Origin Airport: ' . $originAirportName . ' [' . $originAirportCode . ']<br>';
@@ -62,7 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $ticketHtml .= 'Destination Airport: ' . $destinationAirportName . ' [' . $destinationAirportCode . ']<br>';
                     $ticketHtml .= 'Arrival time: ' . $destinationAirportLocalTime . ' (' . timezone_name_get($destinationAirportTimeZone) . ' local time)<br>';
                     $ticketHtml .= 'Flight time: ' . $flightTime . '<br>';
-                    $ticketHtml .= 'Ticket price: ' . $ticketPrice;
+                    $ticketHtml .= 'Ticket price: ' . $ticketPrice . '<br>';
+                    $ticketHtml .= 'Passenger: ' . $passengerName;
 
                 } else { // $ticketPrice < 0
                     $errorMessage = 'Ticket price is less than zero.';
